@@ -93,7 +93,7 @@ struct fpc1020_data {
 	struct regulator *vreg[ARRAY_SIZE(vreg_conf)];
 
 
-	struct wakeup_source ttw_ws;//for kernel 4.9
+	struct wakeup_source *ttw_ws;//for kernel 4.19
 	int irq_gpio;
 	int rst_gpio;
 	//int ldo_gpio;
@@ -504,7 +504,7 @@ static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
 	if (atomic_read(&fpc1020->wakeup_enabled)) {
 
 
-		__pm_wakeup_event(&fpc1020->ttw_ws, FPC_TTW_HOLD_TIME);//for kernel 4.9
+		__pm_wakeup_event(fpc1020->ttw_ws, FPC_TTW_HOLD_TIME);//for kernel 4.19
 	}
 
 	sysfs_notify(&fpc1020->dev->kobj, NULL, dev_attr_irq.attr.name);
@@ -761,8 +761,7 @@ static int fpc1020_probe(struct platform_device *pdev)
 	/* Request that the interrupt should be wakeable */
 	enable_irq_wake(gpio_to_irq(fpc1020->irq_gpio));
 
-
-	wakeup_source_init(&fpc1020->ttw_ws, "fpc_ttw_ws");//for kernel 4.9
+	fpc1020->ttw_ws = wakeup_source_register(fpc1020->dev, "fpc_ttw_ws");//for kernel 4.19
 
 #ifdef CONFIG_TOUCHSCREEN_COMMON
 	fpc1020->input_handler.filter = input_filter;
@@ -816,7 +815,7 @@ static int fpc1020_remove(struct platform_device *pdev)
 	sysfs_remove_group(&pdev->dev.kobj, &attribute_group);
 	mutex_destroy(&fpc1020->lock);
 
-	wakeup_source_trash(&fpc1020->ttw_ws);//for kernel 4.9
+	wakeup_source_unregister(fpc1020->ttw_ws);//for kernel 4.19
 	(void)vreg_setup(fpc1020, "vdd_ana", false);
 	(void)vreg_setup(fpc1020, "vdd_io", false);
 	(void)vreg_setup(fpc1020, "vcc_spi", false);
