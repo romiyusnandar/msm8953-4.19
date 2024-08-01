@@ -682,7 +682,7 @@ dtb-$(CONFIG_ARCH_SDM845_VM) += sdm845-vm.dtb
 
 else # CONFIG_MACH_XIAOMI_YSL
 
-dtb-$(CONFIG_MACH_XIAOMI_YSL) += ysl_msm8953.dtb
+dtb-$(CONFIG_MACH_XIAOMI_YSL) += msm8953-pmi8940-mtp-ysl.dtb
 
 endif # CONFIG_MACH_XIAOMI_YSL
 
