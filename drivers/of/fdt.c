@@ -30,6 +30,8 @@
 #include <asm/setup.h>  /* for COMMAND_LINE_SIZE */
 #include <asm/page.h>
 
+#include <asm/bootinfo.h>
+
 #include "of_private.h"
 
 /*
@@ -984,6 +986,27 @@ const void * __init of_flat_dt_match_machine(const void *default_match,
 	return best_data;
 }
 
+
+void __init early_init_dt_setup_pureason_arch(unsigned long pu_reason)
+{
+	set_powerup_reason(pu_reason);
+	pr_info("[%s] get Powerup reason=0x%x\n", __func__, get_powerup_reason());
+}
+void __init early_init_dt_check_for_powerup_reason(unsigned long node)
+{
+	unsigned long pu_reason;
+	int len;
+	const __be32 *prop;
+	pr_debug("Looking for powerup reason properties... \n");
+	prop = of_get_flat_dt_prop(node, "pureason", &len);
+	if (!prop)
+		return;
+	pu_reason = of_read_ulong(prop, len/4);
+	pr_err("[%s] parse Powerup reason 0x%x\n", __func__, (unsigned int)pu_reason);
+	early_init_dt_setup_pureason_arch(pu_reason);
+}
+
+
 #ifdef CONFIG_BLK_DEV_INITRD
 #ifndef __early_init_dt_declare_initrd
 static void __early_init_dt_declare_initrd(unsigned long start,
@@ -1228,6 +1251,8 @@ int __init early_init_dt_scan_chosen(unsigned long node, const char *uname,
 	}
 
 	pr_debug("Command line is: %s\n", (char*)data);
+
+	early_init_dt_check_for_powerup_reason(node);
 
 	rng_seed = of_get_flat_dt_prop(node, "rng-seed", &l);
 	if (rng_seed && l > 0) {
