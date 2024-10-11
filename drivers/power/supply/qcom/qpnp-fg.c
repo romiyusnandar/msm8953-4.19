@@ -6371,7 +6371,6 @@ static int fg_batt_profile_init(struct fg_chip *chip)
 	const char *data, *batt_type_str;
 	bool tried_again = false, vbat_in_range, profiles_same;
 	u8 reg = 0;
-	int batt_id;
 
 wait:
 	batt_id = get_sram_prop_now(chip, FG_DATA_BATT_ID);
