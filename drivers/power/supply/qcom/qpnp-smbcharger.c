@@ -4418,7 +4418,7 @@ static void xiaomi_jeita_work(struct work_struct *work)
     else
         vote(chip->fcc_votable, CUST_XIAOMI, false, 0);
 	if(chip->bms_psy){
-		chip->bms_psy->get_property(chip->bms_psy, POWER_SUPPLY_PROP_BATTERY_TYPE, &prop);
+		power_supply_get_property(chip->bms_psy, POWER_SUPPLY_PROP_BATTERY_TYPE, &prop);
 		if(strcmp(prop.strval, "unknown-battery") == 0)
 			vote(chip->fcc_votable, "BATTCHG_UNKNOWN", true, 500);
 	}
