@@ -115,6 +115,7 @@ obj-$(CONFIG_TOUCHSCREEN_SYNAPTICS_TCM)	+= synaptics_tcm/
 obj-$(CONFIG_TOUCHSCREEN_FTS)	+= focaltech_touch/
 obj-$(CONFIG_TOUCHSCREEN_NT36XXX)	+= nt36xxx/
 obj-$(CONFIG_TOUCHSCREEN_GT9XX)		+= gt9xx/
+obj-$(CONFIG_TOUCHSCREEN_GT917D)		+= gt917d/
 obj-$(CONFIG_TOUCHSCREEN_FT5446)	+= ft5446/
 obj-$(CONFIG_VITURALSAR)		+= vituralsar_driver.o
 
