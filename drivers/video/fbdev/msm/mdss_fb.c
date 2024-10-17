@@ -40,7 +40,6 @@
 #include <linux/sched.h>
 #include <uapi/linux/sched/types.h>
 #include <linux/mdss_io_util.h>
-#include <linux/device.h>
 #include <linux/pm_wakeup.h>
 #include "mdss_dsi.h"
 #include "mdss_fb.h"
@@ -125,11 +124,13 @@ static void mdss_fb_set_mdp_sync_pt_threshold(struct msm_fb_data_type *mfd,
 
 #define WAIT_RESUME_TIMEOUT 200
 static struct fb_info *prim_fbi;
-static struct delayed_work prim_panel_work;
 static atomic_t prim_panel_is_on;
-static struct wakeup_source prim_panel_wakelock;
 static void prim_panel_off_delayed_work(struct work_struct *work)
 {
+	struct delayed_work *dw = to_delayed_work(work);
+	struct msm_fb_data_type *mfd = container_of(dw, struct msm_fb_data_type,
+		prim_panel_work);
+
 #ifdef CONFIG_FRAMEBUFFER_CONSOLE
 	console_lock();
 #endif
@@ -142,7 +143,7 @@ static void prim_panel_off_delayed_work(struct work_struct *work)
 	if (atomic_read(&prim_panel_is_on)) {
 		fb_blank(prim_fbi, FB_BLANK_POWERDOWN);
 		atomic_set(&prim_panel_is_on, false);
-		__pm_relax(&prim_panel_wakelock);
+		__pm_relax(mfd->prim_panel_wakelock);
 	}
 	unlock_fb_info(prim_fbi);
 #ifdef CONFIG_FRAMEBUFFER_CONSOLE
@@ -1806,8 +1807,8 @@ static int mdss_fb_remove(struct platform_device *pdev)
 
 if (mfd->panel_info && mfd->panel_info->is_prim_panel) {
 		atomic_set(&prim_panel_is_on, false);
-		cancel_delayed_work_sync(&prim_panel_work);
-		wakeup_source_trash(&prim_panel_wakelock);
+		cancel_delayed_work_sync(&mfd->prim_panel_work);
+		wakeup_source_unregister(mfd->prim_panel_wakelock);
 	}
 
 	mdss_fb_remove_sysfs(mfd);
@@ -2509,8 +2510,8 @@ static int mdss_fb_blank(int blank_mode, struct fb_info *info)
 	if ((info == prim_fbi) && (blank_mode == FB_BLANK_UNBLANK) &&
 		atomic_read(&prim_panel_is_on)) {
 		atomic_set(&prim_panel_is_on, false);
-		__pm_relax(&prim_panel_wakelock);
-		cancel_delayed_work_sync(&prim_panel_work);
+		__pm_relax(mfd->prim_panel_wakelock);
+		cancel_delayed_work_sync(&mfd->prim_panel_work);
 		return 0;
 	}
 	ret = mdss_fb_pan_idle(mfd);
@@ -3181,8 +3182,8 @@ static int mdss_fb_register(struct msm_fb_data_type *mfd)
 				if (panel_info->is_prim_panel) {
 		prim_fbi = fbi;
 		atomic_set(&prim_panel_is_on, false);
-		INIT_DELAYED_WORK(&prim_panel_work, prim_panel_off_delayed_work);
-		wakeup_source_init(&prim_panel_wakelock, "prim_panel_wakelock");
+		INIT_DELAYED_WORK(&mfd->prim_panel_work, prim_panel_off_delayed_work);
+		mfd->prim_panel_wakelock = wakeup_source_register(NULL, "prim_panel_wakelock");
 	}
 
 	return 0;
@@ -5731,16 +5732,16 @@ int mdss_prim_panel_fb_unblank(int timeout)
 #endif
 			return 0;
 		}
-		__pm_stay_awake(&prim_panel_wakelock);
+		__pm_stay_awake(mfd->prim_panel_wakelock);
 		ret = fb_blank(prim_fbi, FB_BLANK_UNBLANK);
 		if (!ret) {
 			atomic_set(&prim_panel_is_on, true);
 			if (timeout > 0)
-				schedule_delayed_work(&prim_panel_work, msecs_to_jiffies(timeout));
+				schedule_delayed_work(&mfd->prim_panel_work, msecs_to_jiffies(timeout));
 			else
-				__pm_relax(&prim_panel_wakelock);
+				__pm_relax(mfd->prim_panel_wakelock);
 		} else
-			__pm_relax(&prim_panel_wakelock);
+			__pm_relax(mfd->prim_panel_wakelock);
 		unlock_fb_info(prim_fbi);
 #ifdef CONFIG_FRAMEBUFFER_CONSOLE
 		console_unlock();
