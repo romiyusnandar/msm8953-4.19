@@ -1095,7 +1095,7 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 	on_cmds = &ctrl->on_cmds;
 	cabc_on_cmds = &ctrl->cabc_on_cmds;
 	ce_on_cmds = &ctrl->ce_on_cmds;
-	srgb_on_cmds = &ctrl->srgb_on_cmds
+	srgb_on_cmds = &ctrl->srgb_on_cmds;
 
 	if ((pinfo->mipi.dms_mode == DYNAMIC_MODE_SWITCH_IMMEDIATE) &&
 			(pinfo->mipi.boot_mode != pinfo->mipi.mode))
@@ -2875,7 +2875,7 @@ static int  mdss_dsi_panel_config_res_properties(struct device_node *np,
 	board_id0=gpio_get_value(HW_BOARD_ID_GPIO0);
 	board_id1=gpio_get_value(HW_BOARD_ID_GPIO1);
 	printk("ysg %s:%d board_id0=%d,board_id1=%d,panel_name=%s\n", __func__, __LINE__,
-		board_id0, board_id1, lcd_panel_name)
+		board_id0, board_id1, lcd_panel_name);
 
 	mdss_dsi_parse_roi_alignment(np, pt);
 
