@@ -13,12 +13,6 @@
  */
 
 / {
-	firmware: firmware {
-		android {
-			/delete-node/ fstab;
-			/delete-node/ vbmeta;
-		};
-	};
 	reserved-memory {
 		other_ext_mem: other_ext_region@0 {
  			reg = <0x0 0x84A00000 0x0 0x1E00000>;
