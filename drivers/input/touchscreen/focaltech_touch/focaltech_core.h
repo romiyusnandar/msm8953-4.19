@@ -171,6 +171,7 @@ struct fts_ts_data
     u8 fw_vendor_id;
     int touchs;
     int irq_disable;
+    struct wakeup_source *ps_lock;
 
 	struct pinctrl *ts_pinctrl;
 	struct pinctrl_state *pinctrl_state_active;

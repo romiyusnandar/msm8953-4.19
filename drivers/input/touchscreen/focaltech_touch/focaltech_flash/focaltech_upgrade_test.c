@@ -47,7 +47,6 @@
 /*****************************************************************************
 * Global variable or extern global variabls/functions
 *****************************************************************************/
-struct wakeup_source ps_lock;
 
 #define FTS_DEBUG_UPGRADE(fmt, args...) do{\
 					                            printk(KERN_ERR "[FTS][UPGRADE]:##############################################################################\n");\
@@ -142,9 +141,9 @@ int fts_ctpm_auto_upgrade(struct i2c_client *client)
 	static int uc_ErrorTimes = 0;
 	static int uc_UpgradeTimes = 0;
 
-	wakeup_source_init(&ps_lock, "tp_wakelock");
+	ts->ps_lock = wakeup_source_register(NULL, "tp_wakelock");
 
-	__pm_stay_awake(&ps_lock);
+	__pm_stay_awake(ts->ps_lock);
 
 	/* (FTS_GET_VENDOR_ID_NUM == 0) */
 	g_fw_file = CTPM_FW;
