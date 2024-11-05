@@ -53,7 +53,7 @@
 #include <linux/workqueue.h>
 #include <linux/fs.h>
 #include <linux/proc_fs.h>
-#include <asm/uaccess.h>
+#include <linux/uaccess.h>
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/sched.h>
@@ -171,6 +171,7 @@ struct fts_ts_data
     u8 fw_vendor_id;
     int touchs;
     int irq_disable;
+    struct wakeup_source *ps_lock;
 
 	struct pinctrl *ts_pinctrl;
 	struct pinctrl_state *pinctrl_state_active;
