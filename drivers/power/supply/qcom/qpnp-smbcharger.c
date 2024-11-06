@@ -4980,7 +4980,7 @@ static void smbchg_handle_hvdcp3_disable(struct smbchg_chip *chip)
 			schedule_delayed_work(&chip->hvdcp_det_work,
 				msecs_to_jiffies(HVDCP_NOTIFY_MS));
 	} else {
-		smbchg_change_usb_supply_type(chip, POWER_SUPPLY_TYPE_USB);
+		smbchg_change_usb_supply_type(chip, POWER_SUPPLY_TYPE_UNKNOWN);
 	}
 }
 
