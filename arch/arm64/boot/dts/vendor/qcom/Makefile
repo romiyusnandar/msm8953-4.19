@@ -680,11 +680,11 @@ endif
 
 dtb-$(CONFIG_ARCH_SDM845_VM) += sdm845-vm.dtb
 
-else # CONFIG_MACH_XIAOMI_OXYGEN
+else # CONFIG_MACH_XIAOMI_TISSOT
 
-dtb-$(CONFIG_MACH_XIAOMI_OXYGEN) += oxygen/msm8953-oxygen.dtb
+dtb-$(CONFIG_MACH_XIAOMI_TISSOT) += msm8953-qrd-sku3-tissot.dtb
 
-endif # CONFIG_MACH_XIAOMI_OXYGEN
+endif # CONFIG_MACH_XIAOMI_TISSOT
 
 always		:= $(dtb-y)
 subdir-y	:= $(dts-dirs)
